@@ -95,31 +95,6 @@ class Lexer{
 				else if (chr == ')'){
 					curToken = Token(TokenType::RPAREN, std::string(1, chr));
 				}
-/*				else if (chr == '+'){
-					curToken.type = TokenType::MULTIPLY;
-					curToken.value = chr;
-				}
-				else if (chr == '+'){
-					curToken.type = TokenType::MULTIPLY;
-					curToken.value = chr;
-				}
-				else if (chr == '+'){
-					curToken.type = TokenType::MULTIPLY;
-					curToken.value = chr;
-				}
-				else if (chr == '+'){
-					curToken.type = TokenType::MULTIPLY;
-					curToken.value = chr;
-				}
-				else if (chr == '+'){
-					curToken.type = TokenType::MULTIPLY;
-					curToken.value = chr;
-				}
-				else if (chr == '+'){
-					curToken.type = TokenType::MULTIPLY;
-					curToken.value = chr;
-				}
-				*/
 			}
 			
 			
@@ -159,10 +134,9 @@ class Lexer{
 			
 			
 			std::vector<Token> toPrint = getTokens();
-			for (int i = 0; i < toPrint.size(); i++){
+			for (int i = 0; i < toPrint.size(); i++){ 
 				Token curToken = toPrint.at(i);
 				std::cout << "Type: " << typetostr[curToken.type] << ", Value: " << curToken.value << '\n';
-//				std::cout << "Value: " << curToken.value << '\n';
 			}
 		}
 	
