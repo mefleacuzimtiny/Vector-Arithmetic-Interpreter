@@ -5,18 +5,25 @@
 
 using namespace std;
 
+void raiseError(string errmsg){
+	std::cout << "\nError output:\n";
+	//curToken.printType();
+	throw std::invalid_argument(errmsg);
+}
+
+
 enum class NodeType{
-	ADD, SUB, MUL, DIV, NUM, DEFAULT
+	ADD, SUB, MUL, DIV, NUM, DEFAULT, UNARY_PLUS, UNARY_MINUS
 };
 
 struct BinaryNode{
 	public:
 		NodeType type;
-		float data;
+		double data;
 		BinaryNode* left;
 		BinaryNode* right;
 		
-		BinaryNode(NodeType t = NodeType::DEFAULT, float d = 0, BinaryNode* l = nullptr, BinaryNode* r = nullptr){
+		BinaryNode(NodeType t = NodeType::DEFAULT, double d = 0, BinaryNode* l = nullptr, BinaryNode* r = nullptr){
 //			data = d; type = t; left = nullptr; right = nullptr;
 			data = d; type = t; left = l; right = r;
 		}
@@ -35,12 +42,18 @@ struct BinaryNode{
 		case NodeType::DIV:
 			return "/";
 			break;
+		case NodeType::UNARY_PLUS:
+			return "+";
+			break;
+		case NodeType::UNARY_MINUS:
+			return "-";
+			break;
 		default:
 			return "";
 			break;
 		}
 	}
-		
+	
 	void print(){
 		switch (type){
 			case NodeType::ADD:
@@ -128,61 +141,73 @@ void printPostOrder(BinaryNode start_node){
 	}
 }
 
-BinaryNode evaluate(BinaryNode start_node){	// get left, get right, combine with middle
-	BinaryNode* pCurNode = &start_node;
-	BinaryNode leftnode, rightnode;
-	float leftval, rightval, result;
+double evaluate(BinaryNode* start_node){	// get left, get right, combine with middle
+	BinaryNode* pCurNode = start_node;
+	double toReturn, leftval, rightval;
 	
-	if (pCurNode->left != nullptr){
-		leftnode = evaluate(*pCurNode->left);		// problem: leftnode contains nullptr
-		leftval = leftnode.data;
-		
+	if (pCurNode->left != nullptr){	
+		leftval = evaluate(pCurNode->left);
 	}
 	if (pCurNode->right != nullptr){
-		rightnode = evaluate(*pCurNode->right);
-		rightval = rightnode.data;
+		rightval = evaluate(pCurNode->right);
 	}
 	switch (pCurNode->type){
 	case NodeType::ADD:
-		result = leftval + rightval;
+		toReturn = leftval + rightval;
 		break;
 	case NodeType::SUB:
-		result = leftval - rightval;
+		toReturn = leftval - rightval;
 		break;
 	case NodeType::MUL:
-		result = leftval * rightval;
+		toReturn = leftval * rightval;
 		break;
 	case NodeType::DIV:
-		result = leftval / rightval;
+		if (rightval == 0){
+			raiseError("Cannot divide by zero!");
+		}
+		toReturn = leftval / rightval;
+		break;
+	case NodeType::NUM:
+		toReturn = pCurNode->data;
+		break;
+	case NodeType::UNARY_PLUS:
+		toReturn = rightval;
+		break;
+	case NodeType::UNARY_MINUS:
+		toReturn = - rightval;
 		break;
 	default:
-		result = 0;
+		toReturn = 0;
 		break;
 	}
-	return BinaryNode(NodeType::DEFAULT, result);
+	return toReturn;
 }
 
 
-BinaryNode* ADDnode(float data, BinaryNode* lChild, BinaryNode* rChild){
+BinaryNode* ADDnode(double data, BinaryNode* lChild, BinaryNode* rChild){
 	return new BinaryNode(NodeType::ADD, data, lChild, rChild);
 }
-BinaryNode* SUBnode(float data, BinaryNode* lChild, BinaryNode* rChild){
+BinaryNode* SUBnode(double data, BinaryNode* lChild, BinaryNode* rChild){
 	return new BinaryNode(NodeType::SUB, data, lChild, rChild);
 }
-BinaryNode* MULnode(float data, BinaryNode* lChild, BinaryNode* rChild){
+BinaryNode* MULnode(double data, BinaryNode* lChild, BinaryNode* rChild){
 	return new BinaryNode(NodeType::MUL, data, lChild, rChild);
 }
-BinaryNode* DIVnode(float data, BinaryNode* lChild, BinaryNode* rChild){
+BinaryNode* DIVnode(double data, BinaryNode* lChild, BinaryNode* rChild){
 	return new BinaryNode(NodeType::DIV, data, lChild, rChild);
 }
-BinaryNode* NUMnode(float data){
+BinaryNode* UNARY_PLUSnode(double data, BinaryNode* rChild){
+	return new BinaryNode(NodeType::UNARY_PLUS, data, nullptr, rChild);
+}
+BinaryNode* UNARY_MINUSnode(double data, BinaryNode* rChild){
+	return new BinaryNode(NodeType::UNARY_MINUS, data, nullptr, rChild);
+}
+BinaryNode* NUMnode(double data){
 	return new BinaryNode(NodeType::NUM, data, nullptr, nullptr);
 }
 
 
-void divider(int size, char chr = '-'){
-	cout << '\n' + string(size, chr) + '\n';
-}
+
 
 /*int main(){
 //	BinaryNode a(12);
