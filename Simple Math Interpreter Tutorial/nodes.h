@@ -2,6 +2,7 @@
 #define NODES_H
 #include <iostream>
 #include <string>
+#include <map>
 
 using namespace std;
 
@@ -27,6 +28,20 @@ struct BinaryNode{
 //			data = d; type = t; left = nullptr; right = nullptr;
 			data = d; type = t; left = l; right = r;
 		}
+	
+	string strNodeType(){
+		std::map <NodeType, std::string> nodetypestr{
+			{NodeType::ADD, "ADD"},
+			{NodeType::SUB, "SUB"},
+			{NodeType::MUL, "MUL"},
+			{NodeType::DIV, "DIV"},
+			{NodeType::NUM, "NUM"},
+			{NodeType::DEFAULT, "DEFAULT"},
+			{NodeType::UNARY_PLUS, "UNARY_PLUS"},
+			{NodeType::UNARY_MINUS, "UNARY_MINUS"},
+		};
+		return nodetypestr[type];
+	}
 	
 	string getNodeSymbol(){
 		switch (type) {
@@ -95,10 +110,11 @@ void printInOrder(BinaryNode start_node){
 	if (pCurNode->right != nullptr){
 		cout << " ";
 		printInOrder(*pCurNode->right);
-		cout << ")";
+		if (pCurNode->type != NodeType::UNARY_PLUS && pCurNode->type != NodeType::UNARY_MINUS){
+			cout << ")";
+		}
 	}
 }
-
 void printPreOrder(BinaryNode start_node){
 	BinaryNode* pCurNode = &start_node;
 	
@@ -115,12 +131,14 @@ void printPreOrder(BinaryNode start_node){
 		printPreOrder(*pCurNode->left);
 		cout << ", ";
 	}
+	
 	if (pCurNode->right != nullptr){
 		printPreOrder(*pCurNode->right);
-		cout << ")";
+		if (pCurNode->type != NodeType::UNARY_PLUS && pCurNode->type != NodeType::UNARY_MINUS){
+			cout << ")";
+		}
 	}
 }
-
 void printPostOrder(BinaryNode start_node){
 	BinaryNode* pCurNode = &start_node;
 	
@@ -206,49 +224,42 @@ BinaryNode* NUMnode(double data){
 	return new BinaryNode(NodeType::NUM, data, nullptr, nullptr);
 }
 
+int deleted_nodes = 0;
 
+void wipeTree(BinaryNode*& pCurNode){
+	if (pCurNode == nullptr){
+		return;
+	}
+	
+	wipeTree(pCurNode->left);
+	wipeTree(pCurNode->right);
+	
+	std::cout << "\t| Now deleting: " << pCurNode->strNodeType() << " ";
+	delete pCurNode;
+	pCurNode = nullptr;
+	deleted_nodes++;
+	std::cout << "\nDeleted nodes: [" << deleted_nodes << "] ";
+}
 
-
-/*int main(){
-//	BinaryNode a(12);
-//	BinaryNode b(69);
-//	BinaryNode c(420);
-//	BinaryNode d(2000);
-//	BinaryNode e(10);
-	
-//	a.left = &b;
-//	a.right = &d;
-//	b.right = &c;
-//	b.left = &e;
-	
-	BinaryNode a(NodeType::MUL);
-	BinaryNode b(NodeType::NUM, 12321);
-	BinaryNode c(NodeType::NUM, 78909);
-	
-	a.left =  &b;
-	a.right = &c;
-	a.print();
-	
-	printInOrder(a);
-	divider(100);
-	printPreOrder(a);
-	divider(100);
-	printPostOrder(a);
-	divider(100);
-	
-//	cout << (*a.left).data << endl;
-
-//	cout << (*(*a.left).right).data << endl;		// this is why we use the arrow instead
-//	cout << a.left->right->data << endl;
-
-	
-	
-}*/
-
+//void wipeTree(BinaryNode*& pCurNode){
+//	if (pCurNode->left != nullptr){
+//		wipeTree(pCurNode->left);
+//		
+//		std::cout << pCurNode->strNodeType();
+////		pCurNode->print();
+//		
+//		delete pCurNode;
+//		pCurNode = nullptr;
+//	}
+//	if (pCurNode->right != nullptr){
+//		wipeTree(pCurNode->right);
+//		
+//		std::cout << pCurNode->strNodeType();
+////		pCurNode->print();
+//		
+//		delete pCurNode;
+//		pCurNode = nullptr;
+//	}
+//}
 
 #endif
-
-
-
-
-
