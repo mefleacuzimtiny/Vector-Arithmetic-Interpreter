@@ -58,29 +58,31 @@ struct Parser {
 	
 	Node expression(){
 		using enum TokType;
-		Node result, new_result;
+//		Node result, new_result;
+		Node result;
 		result = factor();
 		
 		while(curToken.type != EOL && (curToken.type == PLUS || curToken.type == MINUS)){	// recursively creates child nodes for operators
-			switch (curToken.type) {
-			case PLUS:
-				nextToken();
+			Node new_result;				// Fixed the issue by declaring new_result inside the loop...
+			switch (curToken.type) {							// FIXED: because it's inside a loop, it's repeatedly pushing result as the left node and factor as the right node
+			case PLUS:											// since no new instance of a node is being created, all the children under the ADD node are being pushed 
+				nextToken();									// into the same vector
 				new_result.type = NodeType::ADD;
 				new_result.children.push_back(result);
 				new_result.children.push_back(factor());
 				std::cout << "Created an ADD NODE" << '\n';
 				break;
-			case MINUS:
+			case MINUS:											// to fix this, I must find a way to create a new instance of a node each time an operation is found
 				nextToken();
 				new_result.type = NodeType::SUB;
 				new_result.children.push_back(result);
-				new_result.children.push_back(factor());	
+				new_result.children.push_back(factor());
 				std::cout << "Created an SUB NODE" << '\n';
 				break;
 			default:break;
 			}
+			result = new_result;		// ... and then by overwriting result with it
 		}
-		if(result.type != NodeType::DEFAULT) return new_result; 
 		return result;
 	}
 	
@@ -119,19 +121,17 @@ struct Parser {
 			break;
 		case TokType::ROUND_S:
 			nextToken();
-			
-			if (curToken.type == TokType::NUMBER){
-				result = parsePVECT();
-				if (curToken.type != TokType::ROUND_E) raiseError("unterminated PVECT"); 
-			}
-			else if (curToken.type == TokType::ROUND_S){
+			if (curToken.type != TokType::NUMBER){
 				result = expression();
 				if (curToken.type != TokType::ROUND_E) raiseError("Incomplete Expression. Unterminated '('");
+			}else{
+				result = parsePVECT();
+				if (curToken.type != TokType::ROUND_E) raiseError("unterminated PVECT"); 
 			}
 			nextToken();
 			break;
 		default:
-			raiseError("Syntax error: Invalid expression. Unexpected token");
+			raiseError("Syntax error: Invalid expression. Unexpected token '" + curToken.data + "'");
 			break;
 		}
 		return result;
@@ -165,20 +165,22 @@ struct Parser {
 		// just use basic trig and stuff to convert to RVECT
 		Node result;
 		Vect toStore;
-		std::array<TokType, 2> format = {TokType::NUMBER, TokType::NUMBER};
-		std::array<std::string, format.size()> captured;
-		
-		for(int i=0; i < format.size(); i++){
-			TokType type = format[i];
-			if(curToken.type == type){
-				captured[i] = curToken.data;
-				nextToken();
-			}else{
-				raiseError("expected " + TokenTypeNames[type]);
-			}
-		}
-		toStore.setMag(std::stof(captured[0]));
-		toStore.setAng(std::stof(captured[1]));
+		toStore.setMag(parseNum());
+		toStore.setAng(parseNum());
+//		std::array<TokType, 2> format = {TokType::NUMBER, TokType::NUMBER};
+//		std::array<std::string, format.size()> captured;
+//		
+//		for(int i=0; i < format.size(); i++){
+//			TokType type = format[i];
+//			if(curToken.type == type){
+//				captured[i] = curToken.data;
+//				nextToken();
+//			}else{
+//				raiseError("expected " + TokenTypeNames[type]);
+//			}
+//		}
+//		toStore.setMag(std::stof(captured[0]));
+//		toStore.setAng(std::stof(captured[1]));
 		
 		result.x = toStore.getX();
 		result.y = toStore.getY();
@@ -189,35 +191,46 @@ struct Parser {
 		// get x and y directly
 		Node result;
 		Vect toStore;
-		std::array<TokType, 2> format = {TokType::NUMBER, TokType::NUMBER};
-		std::array<std::string, format.size()> captured;
 		
-		for(int i=0; i < format.size(); i++){
-			TokType type = format[i];
-			if(curToken.type == type){
-				captured[i] = curToken.data;
-				nextToken();
-			}else{
-				raiseError("expected " + TokenTypeNames[type]);
-			}
-		}
-		toStore.setX(std::stof(captured[0]));
-		toStore.setY(std::stof(captured[1]));
+		toStore.setX(parseNum());
+		toStore.setY(parseNum());
 		result.x = toStore.getX();
 		result.y = toStore.getY();
+		
+//		std::array<TokType, 2> format = {TokType::NUMBER, TokType::NUMBER};
+//		std::array<std::string, format.size()> captured;
+//		
+//		for(int i=0; i < format.size(); i++){
+//			TokType type = format[i];
+//			if(curToken.type == type){
+//				captured[i] = curToken.data;
+//				nextToken();
+//			}else{
+//				raiseError("expected " + TokenTypeNames[type]);
+//			}
+//		}
+//		toStore.setX(std::stof(captured[0]));
+//		toStore.setY(std::stof(captured[1]));
+//		result.x = toStore.getX();
+//		result.y = toStore.getY();
 		std::cout << "Stored RVECT [" << toStore.getX() << " " << toStore.getY() << "] as " << "[" << result.x << " " << result.y << "]"<< '\n';
 		return result;
 	}
-
-
-//	void printthemtokens() {
-//		while(curToken.type != TokType::EOL){
-////		while(i < 20){
-////		while (tokIndex != tokEnd) {
-//			curToken.print();
-//			nextToken();
-//		}
-//	}
+	
+	float parseNum(){
+		std::string result = "";
+		if(curToken.type == TokType::PLUS || curToken.type == TokType::MINUS){
+			result += curToken.data;
+			nextToken();
+		}
+		if(curToken.type == TokType::NUMBER){
+			result += curToken.data;
+			nextToken();
+		}else{
+			raiseError("expected NUMBER");
+		}
+		return std::stof(result);
+	}
 };
 
 

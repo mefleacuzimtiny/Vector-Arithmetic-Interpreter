@@ -66,6 +66,10 @@ public:
 //Cardinal cardinals[8] = {Cardinal::NoE, Cardinal::EoN, Cardinal::WoN, Cardinal::NoW, Cardinal::SoW, Cardinal::WoS, Cardinal::EoS, Cardinal::SoE};
 //Cardinal main_cardinals[4] = {Cardinal::E, Cardinal::N, Cardinal::W, Cardinal::S};
 
+enum struct VectMode{
+	CVECT, PVECT, RVECT
+};
+
 class Vect{
 //	std::string cardinals[8] = {"NoE", "EoN", "WoN", "NoW", "SoW", "WoS", "EoS", "SoE"};
 //	std::string main_cardinals[4] = {"E", "N", "W", "S"};
@@ -177,6 +181,52 @@ public:
 		std::cout << c << " is not a valid cardinal direction." << '\n';
 		return;
 	}
+	void printVect(VectMode mode){
+		std::string mag, c_ang, ang, X, Y;
+		mag = std::to_string(magnitude);
+		c_ang = std::to_string(c_angle);
+		ang = std::to_string(angle);
+		X = std::to_string(x);
+		Y = std::to_string(y);
+		switch (mode) {
+		case VectMode::CVECT:
+			std::cout << "{" << mag << " " << cardinal << " " << c_ang << ")" << '\n';
+			break;
+		case VectMode::PVECT:
+			std::cout << "(" << mag << " " << ang << ")" << '\n';
+			break;
+		case VectMode::RVECT:
+			std::cout << "[" << X << " " << Y << "]" << '\n';
+			break;
+		default:
+			break;
+		}
+//		switch (mode) {
+//		case VectMode::CVECT:
+//			std::cout << "{" << magnitude << " " << cardinal << " " << c_angle << ")" << '\n';
+//			break;
+//		case VectMode::PVECT:
+//			std::cout << "(" << magnitude << " " << angle << ")" << '\n';
+//			break;
+//		case VectMode::RVECT:
+//			std::cout << "[" << x << " " << y << "]" << '\n';
+//			break;
+//		default:
+//			break;
+//		}
+	}
 };
+Vect operator+(Vect vect1, Vect vect2){
+	Vect toReturn {};
+	toReturn.setX(vect1.getX() + vect2.getX());
+	toReturn.setY(vect1.getY() + vect2.getY());
+	return toReturn;
+}
+Vect operator-(Vect vect1, Vect vect2){
+	Vect toReturn {};
+	toReturn.setX(vect1.getX() - vect2.getX());
+	toReturn.setY(vect1.getY() - vect2.getY());
+	return toReturn;
+}
 
 #endif

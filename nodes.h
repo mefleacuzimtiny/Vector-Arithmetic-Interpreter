@@ -7,7 +7,7 @@
 #include <iostream>
 
 enum struct NodeType{
-	ADD, SUB, DOT, CROSS, VECT, UNARY_MINUS, UNARY_PLUS, DEFAULT
+	ADD, SUB, DOT, CROSS, VECT, UNARY_MINUS, UNARY_PLUS, LEAF
 };
 std::unordered_map <NodeType, std::string> NodeTypeNames {
 	{NodeType::ADD, "ADD"},
@@ -17,7 +17,7 @@ std::unordered_map <NodeType, std::string> NodeTypeNames {
 	{NodeType::VECT, "VECT"},
 	{NodeType::UNARY_MINUS, "UNARY_MINUS"},
 	{NodeType::UNARY_PLUS, "UNARY_PLUS"},
-	{NodeType::DEFAULT, "DEFAULT"}
+	{NodeType::LEAF, "LEAF"}
 };
 
 struct Node{
@@ -26,7 +26,7 @@ struct Node{
 	float y;
 	std::vector <Node> children;
 	
-	Node(NodeType t = NodeType::DEFAULT, float X = 0, float Y = 0):
+	Node(NodeType t = NodeType::LEAF, float X = 0, float Y = 0):
 		type{t},
 		x{X},
 		y{Y}
@@ -65,17 +65,16 @@ struct Node{
 		return "[" + std::to_string(x) + " " + std::to_string(y) + "]";
 	}
 	void printNode(){
-		// std::cout << " [" << x << " " << y <<"] ";
-		std::cout << " " << repr() << " ";
+		std::cout << repr();
 	}
 	std::string strType(){
 		return NodeTypeNames[type];
 	}
-	void showChildren(){
-		std::cout << children.size() << '\n';
-		for(int i=0; i < children.size(); i++){
-			std::cout << children[i].strType() << '\n';
-		}
+	bool hasChildren(){
+		return children.size() != 0;
+	}
+	bool isLeaf(){
+		return children.size() == 0;
 	}
 };
 #endif
