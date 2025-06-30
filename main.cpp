@@ -81,10 +81,10 @@ Vect evaluate(Node cur_node){
 }
 
 int main(){
-	Lexer peepee(  "(12.3 9.11) + ({911 WoS 456} - [420.23 .69]) - ((1 45) + {9 now 18})"  );
-//	Lexer peepee(  "(12.3 9.11) - [-420.23 .69]"  );
-//	Lexer peepee(  "{911 WoS 456} - [420.23 .69]"  );
-	Parser abc(peepee);
+	Lexer testinput(  "(12.3 9.11) + ({911 WoS 456} - [420.23 .69]) - ((1 45) + {9 now 18})"  );
+//	Lexer testinput(  "(12.3 9.11) - [-420.23 .69]"  );
+//	Lexer testinput(  "{911 WoS 456} - [420.23 .69]"  );
+	Parser abc(testinput);
 	
 	Node root = abc.generateTree();
 	traverseTree(root, TraversalMode::PRE_ORDER);
