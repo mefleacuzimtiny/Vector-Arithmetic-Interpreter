@@ -1,0 +1,26 @@
+# Ignore Windows executables
+*.exe
+
+# Ignore precompiled headers
+*.gch
+
+# Ignore IDE settings
+.vscode/
+.codelite/
+
+# Ignore workspace/session files
+*.workspace
+*.session
+
+# Ignore the 'garbage' directory entirely
+garbage/
+
+# (Optional) Ignore Python scripts if not needed in repo
+# *.py
+
+# Ignore build artifacts in nested directories
+Simple Math Interpreter Tutorial/*.exe
+Simple Math Interpreter Tutorial/*.gch
+Simple Math Interpreter Tutorial/*.workspace
+Simple Math Interpreter Tutorial/.codelite/
+Simple Math Interpreter Tutorial/.vscode/
